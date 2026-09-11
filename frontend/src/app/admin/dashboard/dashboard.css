@@ -51,7 +51,7 @@
 
 .admin-header h1 {
   margin: 0;
-  color: #1d2c44;
+  color: #000000;
   font-size: 28px;
   font-weight: 700;
 }
@@ -93,8 +93,8 @@
 .admin-profile small {
   display: block;
   margin-top: 3px;
-  color: #6580aa;
-  font-size: 13px;
+  color: #488af5;
+  font-size: 14px;
 }
 
 
@@ -131,7 +131,7 @@
   margin-bottom: 8px;
 
   color: #5273ad;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 800;
   letter-spacing: 1.4px;
 }
@@ -145,7 +145,7 @@
 
 .overview p {
   margin: 8px 0 0;
-  color: #57709a;
+  color: #080808;
   font-size: 15px;
 }
 
