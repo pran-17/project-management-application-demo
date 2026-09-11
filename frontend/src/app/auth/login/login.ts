@@ -2,9 +2,17 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 
 type UserRole = 'student' | 'teacher' | 'admin';
+
+interface DemoUser {
+  email: string;
+  password: string;
+  role: UserRole;
+  name: string;
+  department: string;
+  referenceId: string;
+}
 
 @Component({
   selector: 'app-login',
@@ -27,9 +35,40 @@ export class Login {
 
   errorMessage = '';
 
+  // Frontend-only demo users
+  private demoUsers: DemoUser[] = [
+
+    {
+      email: 'admin@gmail.com',
+      password: 'admin123',
+      role: 'admin',
+      name: 'Administrator',
+      department: 'Administration',
+      referenceId: 'admin-001'
+    },
+
+    {
+      email: 'teacher@gmail.com',
+      password: 'teacher123',
+      role: 'teacher',
+      name: 'Dr. Kumar',
+      department: 'Computer Science',
+      referenceId: 'teacher-001'
+    },
+
+    {
+      email: 'student@gmail.com',
+      password: 'student123',
+      role: 'student',
+      name: 'Praneeth',
+      department: 'Computer Science',
+      referenceId: 'student-001'
+    }
+
+  ];
+
   constructor(
-    private router: Router,
-    private http: HttpClient
+    private router: Router
   ) {}
 
   selectRole(role: UserRole): void {
@@ -41,35 +80,51 @@ export class Login {
 
     this.errorMessage = '';
 
+    // Validate email
     if (!this.email.trim()) {
       this.errorMessage = 'Please enter your email address.';
       return;
     }
 
+    // Validate password
     if (!this.password.trim()) {
       this.errorMessage = 'Please enter your password.';
       return;
     }
 
-    this.http.post<{ token: string; user: { role: UserRole } }>(
-      'http://localhost:5000/api/auth/login',
-      {
-        email: this.email.trim().toLowerCase(),
-        password: this.password
-      }
-    ).subscribe({
-      next: response => {
-        if (response.user.role !== this.selectedRole) {
-          this.errorMessage = 'Invalid email, password or selected role.';
-          return;
-        }
+    // Find matching user
+    const user = this.demoUsers.find(
+      item =>
+        item.email === this.email.trim().toLowerCase() &&
+        item.password === this.password &&
+        item.role === this.selectedRole
+    );
 
-        localStorage.setItem('token', response.token);
-        this.router.navigate([`/${response.user.role}/dashboard`]);
-      },
-      error: error => {
-        this.errorMessage = error.error?.message || 'Unable to connect to the backend.';
-      }
-    });
+    // Invalid login
+    if (!user) {
+      this.errorMessage =
+        'Invalid email, password or selected role.';
+      return;
+    }
+
+    // Store demo authentication
+    sessionStorage.setItem('token', 'demo-token');
+
+    sessionStorage.setItem(
+      'user',
+      JSON.stringify({
+        id: user.referenceId,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        referenceId: user.referenceId,
+        department: user.department
+      })
+    );
+
+    // Navigate according to role
+    this.router.navigate([
+      `/${user.role}/dashboard`
+    ]);
   }
 }
